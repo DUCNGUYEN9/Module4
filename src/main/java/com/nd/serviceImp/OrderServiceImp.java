@@ -1,0 +1,62 @@
+package com.nd.serviceImp;
+
+import com.nd.model.Order;
+import com.nd.repository.OrderRepository;
+import com.nd.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class OrderServiceImp implements OrderService {
+    @Autowired
+    private OrderRepository orderRepository;
+    @Override
+    public List<Order> displayData(String orderId, int page, int size, String direction, String sortBy) {
+        Pageable pageable = PageRequest.of(page,size,
+                direction.equals("ASC")? Sort.Direction.ASC: Sort.Direction.DESC,sortBy);
+        List<Order> orderList = orderRepository.findByOrderId(orderId,pageable).getContent();
+        return orderList;
+    }
+
+    @Override
+    public List<Integer> getListPage(String orderId, int size) {
+        int count = orderRepository.countByOrderId(orderId);
+        List<Integer> listPage = new ArrayList<>();
+        for (int i = 0; i < (int) Math.ceil((double) count / (double) size); i++) {
+            listPage.add(i+1);
+        }
+        return listPage;
+    }
+
+    @Override
+    public Order findById(String orderId) {
+        return orderRepository.findById(orderId).get();
+    }
+
+
+    @Override
+    public List<Order> findAll() {
+        return orderRepository.findAll();
+    }
+
+    @Override
+    public float getRevenueDay() {
+        return orderRepository.getRevenueDay();
+    }
+
+    @Override
+    public float getRevenueMonth() {
+        return orderRepository.getRevenueMonth();
+    }
+
+    @Override
+    public float getRevenueYear() {
+        return orderRepository.getRevenueYear();
+    }
+}
